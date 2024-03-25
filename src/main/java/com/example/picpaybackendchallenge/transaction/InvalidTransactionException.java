@@ -1,4 +1,4 @@
-package com.example.picpaybackendchallenge.exception;
+package com.example.picpaybackendchallenge.transaction;
 
 public class InvalidTransactionException extends RuntimeException {
 

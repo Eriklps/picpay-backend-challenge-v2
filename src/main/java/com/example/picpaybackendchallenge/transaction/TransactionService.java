@@ -1,22 +1,21 @@
 package com.example.picpaybackendchallenge.transaction;
 
-import com.example.picpaybackendchallenge.exception.InvalidTransactionException;
-import com.example.picpaybackendchallenge.wallet.Wallet;
+import com.example.picpaybackendchallenge.authorization.AuthorizerService;
 import com.example.picpaybackendchallenge.wallet.WalletRepository;
 import com.example.picpaybackendchallenge.wallet.WalletType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
+    private final AuthorizerService authorizerService;
 
-    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository) {
+    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository, AuthorizerService authorizerService) {
         this.transactionRepository = transactionRepository;
         this.walletRepository = walletRepository;
+        this.authorizerService = authorizerService;
     }
 
     @Transactional
@@ -33,8 +32,7 @@ public class TransactionService {
 
         // 4 - Call external services
         // Authorize transaction
-
-
+        authorizerService.authorize(transaction);
 
         return newTransaction;
     }
