@@ -1,9 +1,11 @@
 package com.example.picpaybackendchallenge.transaction;
 
+import com.example.picpaybackendchallenge.exception.InvalidTransactionException;
 import com.example.picpaybackendchallenge.wallet.Wallet;
 import com.example.picpaybackendchallenge.wallet.WalletRepository;
 import com.example.picpaybackendchallenge.wallet.WalletType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ public class TransactionService {
         this.walletRepository = walletRepository;
     }
 
+    @Transactional
     public Transaction create(Transaction transaction) {
         // 1 - Validate transaction
         validate(transaction);
@@ -29,6 +32,8 @@ public class TransactionService {
         walletRepository.save(wallet.debit(transaction.value()));
 
         // 4 - Call external services
+        // Authorize transaction
+
 
 
         return newTransaction;
@@ -44,15 +49,14 @@ public class TransactionService {
     private void validate(Transaction transaction) {
         walletRepository.findById(transaction.payee())
                 .map(payee -> walletRepository.findById(transaction.payer())
-                        .map(payer -> isTransactionValid(transaction, payer) ? true : null)
-                        .orElseThrow())
-                .orElseThrow();
-    }
-
-    private static boolean isTransactionValid(Transaction transaction, Wallet payer) {
-        return payer.type() == WalletType.COMUM.getValue() &&
-                payer.balance().compareTo(transaction.value()) >= 0 &&
-                !payer.id().equals(transaction.payee());
+                        .map(
+                                payer -> payer.type() == WalletType.COMUM.getValue() &&
+                                        payer.balance().compareTo(transaction.value()) >= 0 &&
+                                        !payer.id().equals(transaction.payee()) ? true : null)
+                        .orElseThrow(() -> new InvalidTransactionException(
+                                "Invalid transaction - " + transaction)))
+                .orElseThrow(() -> new InvalidTransactionException(
+                        "Invalid transaction - " + transaction));
     }
 
 }
