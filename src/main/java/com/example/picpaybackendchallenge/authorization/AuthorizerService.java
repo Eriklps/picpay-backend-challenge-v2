@@ -1,6 +1,7 @@
 package com.example.picpaybackendchallenge.authorization;
 
 import com.example.picpaybackendchallenge.transaction.Transaction;
+import com.example.picpaybackendchallenge.transaction.UnauthorizedTransactionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
