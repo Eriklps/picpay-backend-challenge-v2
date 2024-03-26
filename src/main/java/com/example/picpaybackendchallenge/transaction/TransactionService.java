@@ -31,11 +31,15 @@ public class TransactionService {
         // 2 - Create transaction
         var newTransaction = transactionRepository.save(transaction);
 
-        // 3 - Debit from wallet
-        var wallet = walletRepository.findById(transaction.payer()).get();
-        walletRepository.save(wallet.debit(transaction.value()));
+        // 3 - Debit from payer wallet
+        var walletPayer = walletRepository.findById(transaction.payer()).get();
+        walletRepository.save(walletPayer.debit(transaction.value()));
 
-        // 4 - Call external services
+        // 4- Credit on payee wallet
+        var walletPayee = walletRepository.findById(transaction.payee()).get();
+        walletRepository.save(walletPayer.credit(transaction.value()));
+
+        // 5 - Call external services
         // Authorize transaction
         authorizerService.authorize(transaction);
 
