@@ -1,6 +1,7 @@
 package com.example.picpaybackendchallenge.transaction;
 
 import com.example.picpaybackendchallenge.authorization.AuthorizerService;
+import com.example.picpaybackendchallenge.notification.NotificationService;
 import com.example.picpaybackendchallenge.wallet.WalletRepository;
 import com.example.picpaybackendchallenge.wallet.WalletType;
 import org.springframework.stereotype.Service;
@@ -11,11 +12,13 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
     private final AuthorizerService authorizerService;
+    private final NotificationService notificationService;
 
-    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository, AuthorizerService authorizerService) {
+    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository, AuthorizerService authorizerService, NotificationService notificationService) {
         this.transactionRepository = transactionRepository;
         this.walletRepository = walletRepository;
         this.authorizerService = authorizerService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -33,6 +36,9 @@ public class TransactionService {
         // 4 - Call external services
         // Authorize transaction
         authorizerService.authorize(transaction);
+
+        // Notification
+        notificationService.notify(transaction);
 
         return newTransaction;
     }
