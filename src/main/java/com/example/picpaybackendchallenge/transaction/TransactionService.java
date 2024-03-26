@@ -7,6 +7,8 @@ import com.example.picpaybackendchallenge.wallet.WalletType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class TransactionService {
     private final TransactionRepository transactionRepository;
@@ -61,6 +63,10 @@ public class TransactionService {
                                 "Invalid transaction - " + transaction)))
                 .orElseThrow(() -> new InvalidTransactionException(
                         "Invalid transaction - " + transaction));
+    }
+
+    public List<Transaction> list() {
+        return transactionRepository.findAll();
     }
 
 }
